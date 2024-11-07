@@ -17,6 +17,14 @@ dependencies {
 }
 
 tasks {
+    jar {
+        manifest {
+            attributes(
+                "Main-Class" to "rip.sunrise.client.ClientInitializerKt"
+            )
+        }
+    }
+
     build {
         finalizedBy(shadowJar)
     }
