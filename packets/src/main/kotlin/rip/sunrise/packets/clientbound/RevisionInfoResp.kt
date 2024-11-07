@@ -6,4 +6,4 @@ import java.io.Serializable
  * Revision info response
  * e -> revision data
  */
-data class RevisionInfoResp(val e: String) : Serializable
+data class RevisionInfoResp(val e: String?) : Serializable

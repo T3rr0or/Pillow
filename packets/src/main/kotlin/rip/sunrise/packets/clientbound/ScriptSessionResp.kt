@@ -5,6 +5,6 @@ import java.io.Serializable
 /**
  * Script start response
  * v -> a switch, 0 for ???, 1 for too many clients, 2 for ???
- * c -> some data ???
+ * c -> script session id
  */
-data class ScriptSessionResp(val v: Byte, val c: String) : Serializable
+data class ScriptSessionResp(val v: Byte, val c: String?) : Serializable

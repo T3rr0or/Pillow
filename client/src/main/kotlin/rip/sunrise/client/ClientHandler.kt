@@ -14,10 +14,14 @@ import java.util.concurrent.ArrayBlockingQueue
 import kotlin.concurrent.thread
 import kotlin.io.path.Path
 
-class ClientHandler : ChannelInboundHandlerAdapter() {
-    private val SOME_CONSTANT = "f95cf4001d19fc517ccc94"
-    private val OTHER_CONSTANT = "3b40bcda6a4fe1c577ae30b3212d16b6"
+// Literally constant in the DreamBot jar.
+// TODO: Monitor changes to this on updates.
+private const val SOME_CONSTANT = "f95cf4001d19fc517ccc94"
+// Check out the comment in LoginRequest for a breakdown of what this is.
+private const val HARDWARE_ID = "3b40bcda6a4fe1c577ae30b3212d16b6"
+//private const val HARDWARE_ID = "785ae75d744fa70b617fe8bb30b6cc71"
 
+class ClientHandler : ChannelInboundHandlerAdapter() {
     private lateinit var accountSession: String
     private lateinit var scriptSession: String
     private var userId: Int = -1
@@ -27,26 +31,43 @@ class ClientHandler : ChannelInboundHandlerAdapter() {
     override fun channelActive(ctx: ChannelHandlerContext) {
         println("Open")
 
-        ctx.writeAndFlush(LoginRequest("gangie425", "siemagang1234!", SOME_CONSTANT))
+        ctx.writeAndFlush(LoginRequest("", "", SOME_CONSTANT))
+    }
+
+    override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+        ctx.disconnect()
+        throw RuntimeException(cause)
     }
 
     override fun channelRead(ctx: ChannelHandlerContext, msg: Any) {
         when (msg) {
             is LoginResp -> {
-                accountSession = msg.d
                 userId = msg.a
+                accountSession = msg.d
 
-                ctx.writeAndFlush(RevisionInfoRequest(OTHER_CONSTANT, SOME_CONSTANT))
-                ctx.writeAndFlush(ScriptSessionRequest("$accountSession:MID:$OTHER_CONSTANT"))
+                if (userId <= 0 || accountSession.isEmpty()) {
+                    error("Something went wrong logging in! Try changing the HARDWARE_ID, IP, or account. $msg")
+                }
+
+                ctx.writeAndFlush(RevisionInfoRequest(HARDWARE_ID, SOME_CONSTANT))
+                ctx.writeAndFlush(ScriptSessionRequest("$accountSession:MID:$HARDWARE_ID"))
             }
 
             is RevisionInfoResp -> {
-                writeRevisionData(msg.e)
+                if (msg.e == null) {
+                    error("Failed to get revision info. The constant or HARDWARE_ID might be incorrect.")
+                }
+
+                writeRevisionData(msg.e!!)
                 println("Revision data written")
             }
 
             is ScriptSessionResp -> {
-                scriptSession = msg.c
+                if (msg.c == null) {
+
+                    error("Failed to get script session. The HARDWARE_ID might be incorrect.")
+                }
+                scriptSession = msg.c!!
 
                 // NOTE: Change if you want to dump free scripts
                 ctx.writeAndFlush(PaidScriptListRequest(accountSession))
