@@ -21,21 +21,28 @@ class Config(private val configFile: File) {
             val config = gson.fromJson(configFile.reader(), Config::class.java)
 
             val revisionFile = File(config.revisionFile)
-            assert(revisionFile.isFile)
+            if (!revisionFile.isFile) {
+                error("Revision file ${revisionFile.absolutePath} isn't a normal file!")
+            }
 
             val scriptConfigDirectory = File(config.scriptConfigDir)
-            assert(scriptConfigDirectory.isDirectory)
+            if (!scriptConfigDirectory.isDirectory) {
+                error("Script config directory ${scriptConfigDirectory.absolutePath} is not a directory!")
+            }
 
             scripts.clear()
             scriptConfigDirectory.listFiles()!!.forEachIndexed { index, file ->
                 val scriptConfig = Gson().fromJson(file.reader(), ScriptConfig::class.java)
 
                 val scriptJar = File(scriptConfig.jarFile)
-                println(scriptJar)
-                assert(scriptJar.isFile)
+                if (!scriptJar.isFile) {
+                    error("Script jar ${scriptJar.absolutePath} isn't a normal file!")
+                }
 
                 val optionFile = File(scriptConfig.optionFile)
-                assert(optionFile.isFile)
+                if (!optionFile.isFile) {
+                    error("Option file ${scriptJar.absolutePath} isn't a normal file!")
+                }
 
                 val metadata = ScriptWrapper(
                     0,

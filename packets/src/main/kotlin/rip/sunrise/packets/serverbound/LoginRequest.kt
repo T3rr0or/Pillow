@@ -3,7 +3,6 @@ package rip.sunrise.packets.serverbound
 import java.io.Serializable
 
 /**
- * Login request
  * l -> username
  * x -> password
  * f -> hardware id

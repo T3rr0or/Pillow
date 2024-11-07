@@ -37,9 +37,6 @@ class ServerHandler(private val config: Config, private val http: JarHttpServer)
 
             is af -> ctx.writeAndFlush(am(6))
 
-//            is bC -> ctx.writeAndFlush(ah(0))
-//            is aZ -> ctx.writeAndFlush(ah(1))
-
             is aY -> ctx.writeAndFlush(bs(USER_ID))
 
             is ScriptURLRequest -> {

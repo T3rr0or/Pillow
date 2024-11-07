@@ -3,7 +3,7 @@ package rip.sunrise.packets.clientbound
 import java.io.Serializable
 
 /**
- * Another script start response
+ * Response for starting local scripts.
  * r -> whether the script should stop
  */
 data class ScriptStartResp(val r: Boolean) : Serializable

@@ -3,7 +3,6 @@ package rip.sunrise.packets.clientbound
 import java.io.Serializable
 
 /**
- * Login response
  * b -> username
  * d -> account session token
  * v -> forum ranks

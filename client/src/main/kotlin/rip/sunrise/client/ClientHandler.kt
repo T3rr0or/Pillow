@@ -17,11 +17,8 @@ import kotlin.io.path.Path
 // Literally constant in the DreamBot jar.
 // TODO: Monitor changes to this on updates.
 private const val SOME_CONSTANT = "f95cf4001d19fc517ccc94"
-// Check out the comment in LoginRequest for a breakdown of what this is.
-private const val HARDWARE_ID = "3b40bcda6a4fe1c577ae30b3212d16b6"
-//private const val HARDWARE_ID = "785ae75d744fa70b617fe8bb30b6cc71"
 
-class ClientHandler : ChannelInboundHandlerAdapter() {
+class ClientHandler(val username: String, val password: String, val hardwareId: String) : ChannelInboundHandlerAdapter() {
     private lateinit var accountSession: String
     private lateinit var scriptSession: String
     private var userId: Int = -1
@@ -31,7 +28,7 @@ class ClientHandler : ChannelInboundHandlerAdapter() {
     override fun channelActive(ctx: ChannelHandlerContext) {
         println("Open")
 
-        ctx.writeAndFlush(LoginRequest("", "", SOME_CONSTANT))
+        ctx.writeAndFlush(LoginRequest(username, password, SOME_CONSTANT))
     }
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
@@ -49,8 +46,8 @@ class ClientHandler : ChannelInboundHandlerAdapter() {
                     error("Something went wrong logging in! Try changing the HARDWARE_ID, IP, or account. $msg")
                 }
 
-                ctx.writeAndFlush(RevisionInfoRequest(HARDWARE_ID, SOME_CONSTANT))
-                ctx.writeAndFlush(ScriptSessionRequest("$accountSession:MID:$HARDWARE_ID"))
+                ctx.writeAndFlush(RevisionInfoRequest(hardwareId, SOME_CONSTANT))
+                ctx.writeAndFlush(ScriptSessionRequest("$accountSession:MID:$hardwareId"))
             }
 
             is RevisionInfoResp -> {
